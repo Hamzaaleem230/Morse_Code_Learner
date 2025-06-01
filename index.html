@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Morse Code Learner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: radial-gradient(circle at top, #111, #000);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      height: 100vh;
+      margin: 0;
+      padding-top: 30px;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    h2 {
+      font-size: 2rem;
+      color: #0ff;
+      text-shadow: 0 0 10px #0ff;
+      animation: fadeIn 1.5s ease-in-out;
+    }
+
+    select {
+      padding: 10px;
+      margin: 15px 0;
+      font-size: 1rem;
+      border-radius: 10px;
+      background-color: #111;
+      color: #0ff;
+      border: 2px solid #0ff;
+      animation: fadeIn 2s ease-in-out;
+    }
+
+    .card {
+      background: #111;
+      border: 2px solid #0ff;
+      border-radius: 20px;
+      padding: 25px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 0 20px #0ff5;
+      animation: slideIn 1s ease-out;
+    }
+
+    .letter {
+      font-size: 6rem;
+      font-weight: bold;
+      color: #0ff;
+      text-shadow: 0 0 20px #0ff;
+      transition: all 0.4s ease-in-out;
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    .morse {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: #ccc;
+      animation: fadeIn 1.5s ease-in;
+    }
+
+    .buttons button, select {
+      margin: 8px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      background-color: #0ff;
+      color: #000;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .buttons button:hover {
+      transform: scale(1.05);
+      background-color: #0ee;
+    }
+
+    .inputBox {
+      margin-top: 15px;
+    }
+
+    #practiceInput {
+      padding: 10px;
+      border-radius: 8px;
+      border: 2px solid #0ff;
+      background: #000;
+      color: #0ff;
+      width: 80%;
+      text-align: center;
+      font-size: 1.1rem;
+    }
+
+    #result {
+      margin-top: 10px;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { text-shadow: 0 0 10px #0ff; transform: scale(1); }
+      50% { text-shadow: 0 0 20px #0ff; transform: scale(1.05); }
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Morse Code Learner</h2>
+
+  <select onchange="changeCategory(this.value)">
+    <option value="alphabets">🔤 Alphabets</option>
+    <option value="numbers">🔢 Numbers</option>
+    <option value="practice">🧠 Mashaq</option>
+  </select>
+
+  <div class="card" id="mainCard">
+    <div class="letter" id="letter">A</div>
+    <div class="morse" id="morse">.-</div>
+
+    <div class="inputBox" id="practiceBox" style="display:none;">
+      <input type="text" id="practiceInput" placeholder="Enter Morse code">
+      <div id="result"></div>
+    </div>
+
+    <div class="buttons">
+      <button onclick="prev()">Previous</button>
+      <button onclick="next()">Next</button>
+      <button onclick="checkAnswer()" id="checkBtn" style="display:none;">Check</button>
+    </div>
+  </div>
+
+  <script>
+    const morseAlphabets = {
+      A: ".-", B: "-...", C: "-.-.", D: "-..", E: ".",
+      F: "..-.", G: "--.", H: "....", I: "..", J: ".---",
+      K: "-.-", L: ".-..", M: "--", N: "-.", O: "---",
+      P: ".--.", Q: "--.-", R: ".-.", S: "...", T: "-",
+      U: "..-", V: "...-", W: ".--", X: "-..-", Y: "-.--", Z: "--.."
+    };
+
+    const morseNumbers = {
+      0: "-----", 1: ".----", 2: "..---", 3: "...--",
+      4: "....-", 5: ".....", 6: "-....", 7: "--...",
+      8: "---..", 9: "----."
+    };
+
+    let currentCategory = "alphabets";
+    let currentData = Object.entries(morseAlphabets);
+    let index = 0;
+
+    function updateCard() {
+      document.getElementById("letter").innerText = currentData[index][0];
+      document.getElementById("morse").innerText = currentCategory === "practice" ? "?" : currentData[index][1];
+      document.getElementById("practiceBox").style.display = currentCategory === "practice" ? "block" : "none";
+      document.getElementById("checkBtn").style.display = currentCategory === "practice" ? "inline-block" : "none";
+      document.getElementById("result").innerText = "";
+      document.getElementById("practiceInput").value = "";
+    }
+
+    function next() {
+      if (index < currentData.length - 1) {
+        index++;
+        updateCard();
+      }
+    }
+
+    function prev() {
+      if (index > 0) {
+        index--;
+        updateCard();
+      }
+    }
+
+    function changeCategory(cat) {
+      currentCategory = cat;
+      index = 0;
+      if (cat === "alphabets") {
+        currentData = Object.entries(morseAlphabets);
+      } else if (cat === "numbers") {
+        currentData = Object.entries(morseNumbers);
+      } else {
+        const merged = { ...morseAlphabets, ...morseNumbers };
+        currentData = Object.entries(merged);
+      }
+      updateCard();
+    }
+
+    function checkAnswer() {
+      const userInput = document.getElementById("practiceInput").value.trim();
+      const correct = currentData[index][1];
+      const result = document.getElementById("result");
+      if (userInput === correct) {
+        result.innerText = "✅ درست!";
+        result.style.color = "lightgreen";
+      } else {
+        result.innerText = `❌ غلط! درست کوڈ: ${correct}`;
+        result.style.color = "red";
+      }
+    }
+
+    updateCard();
+  </script>
+</body>
+</html>
